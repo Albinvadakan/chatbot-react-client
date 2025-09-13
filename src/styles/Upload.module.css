@@ -1,0 +1,50 @@
+.uploadContainer {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(60, 80, 180, 0.04);
+  padding: 2rem 2.5rem 2rem 2.5rem;
+  margin: 2rem auto;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.uploadForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+  align-items: center;
+}
+
+.fileInput {
+  padding: 0.5rem;
+  border: 1.5px solid #e0e7ef;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #f8f9fa;
+  width: 100%;
+}
+
+.uploadBtn {
+  padding: 0.7rem 2.2rem;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.uploadBtn:hover {
+  background: #1251a3;
+}
+
+.message {
+  margin-top: 1rem;
+  color: #1976d2;
+  font-size: 1rem;
+  text-align: center;
+}

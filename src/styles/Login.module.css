@@ -1,0 +1,90 @@
+
+.loginContainer {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef3fd;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.loginForm {
+  background: #fff;
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(60, 80, 180, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  min-width: 380px;
+  align-items: stretch;
+}
+
+.loginForm label {
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+  margin-top: 0.5rem;
+}
+
+.loginForm input {
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #bfcfff;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  margin-bottom: 0.5rem;
+  transition: border 0.2s;
+}
+.loginForm input:focus {
+  border: 1.5px solid #2979ff;
+  box-shadow: 0 0 0 2px #e3eaff;
+}
+
+.loginForm button {
+  padding: 0.75rem 0;
+  background: linear-gradient(90deg, #3b82f6 0%, #9333ea 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(60, 80, 180, 0.08);
+}
+.loginForm button:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.loginForm h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  text-align: center;
+}
+
+.loginForm .subtitle {
+  color: #555;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 0.2rem;
+}
+
+.loginForm .demo {
+  color: #2563eb;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
