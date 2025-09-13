@@ -97,6 +97,18 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
       });
     };
 
+    const handleAiResponse = (data) => {
+      // Handle complete AI response (non-streaming)
+      setMessages(prev => [...prev, {
+        id: data.messageId,
+        sender: 'ai',
+        text: data.content,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: data.timestamp,
+        patient_context: data.patient_context
+      }]);
+    };
+
     const handleError = (error) => {
       setError(error.message || 'WebSocket connection error');
       setConnectionStatus('DISCONNECTED');
@@ -109,6 +121,7 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
     websocketService.on('stream-start', handleStreamStart);
     websocketService.on('stream-token', handleStreamToken);
     websocketService.on('stream-end', handleStreamEnd);
+    websocketService.on('ai-response', handleAiResponse);
     websocketService.on('error', handleError);
 
     // Connect to WebSocket server
@@ -123,6 +136,7 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
       websocketService.off('stream-start', handleStreamStart);
       websocketService.off('stream-token', handleStreamToken);
       websocketService.off('stream-end', handleStreamEnd);
+      websocketService.off('ai-response', handleAiResponse);
       websocketService.off('error', handleError);
       websocketService.disconnect();
     };

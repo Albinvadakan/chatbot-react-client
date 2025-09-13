@@ -42,9 +42,29 @@
   background: #1251a3;
 }
 
+.uploadBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
 .message {
   margin-top: 1rem;
   color: #1976d2;
   font-size: 1rem;
   text-align: center;
+}
+
+.fileInfo {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #e0e7ef;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.fileInfo p {
+  margin: 0.3rem 0;
 }

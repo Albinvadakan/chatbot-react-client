@@ -1,5 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { WebSocketProvider } from './contexts/WebSocketContext';
@@ -37,6 +39,17 @@ function App() {
           setUsername(user ? JSON.parse(user).username : '');
         }} />
       )}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </WebSocketProvider>
   );
 }

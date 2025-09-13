@@ -116,6 +116,16 @@ class WebSocketService {
         }
         break;
         
+      case 'ai-response':
+        // Handle complete AI response (non-streaming)
+        this.emit('ai-response', {
+          messageId: message.messageId,
+          content: message.message,
+          timestamp: message.timestamp,
+          patient_context: message.patient_context
+        });
+        break;
+        
       case 'human-escalation-response':
         this.emit('system-message', {
           text: message.message,
