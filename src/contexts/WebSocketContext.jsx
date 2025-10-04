@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import websocketService from '../services/websocket.js';
 
 const WebSocketContext = createContext();
@@ -17,6 +17,11 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
   const [streamingMessages, setStreamingMessages] = useState(new Map());
   const [error, setError] = useState(null);
   const [currentToken, setCurrentToken] = useState(() => localStorage.getItem('token'));
+  const [isTyping, setIsTyping] = useState(false);
+  const [messageFeedback, setMessageFeedback] = useState(new Map()); // Track feedback for each message
+  const typingTimeoutRef = useRef(null);
+  const connectionInitialized = useRef(false); // Track if connection has been initialized
+  const connectionMessageShown = useRef(false); // Track if connection message was already shown
 
   // Monitor token changes and reconnect if needed
   useEffect(() => {
@@ -39,9 +44,18 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
 
     const handleDisconnected = () => {
       setConnectionStatus('DISCONNECTED');
+      connectionMessageShown.current = false; // Reset when disconnected
     };
 
     const handleSystemMessage = (data) => {
+      // Prevent duplicate connection messages using ref to avoid closure issues
+      if (data.text && data.text.toLowerCase().includes('connected')) {
+        if (connectionMessageShown.current) {
+          return; // Don't add duplicate connection message
+        }
+        connectionMessageShown.current = true; // Mark that we've shown the connection message
+      }
+
       setMessages(prev => [...prev, {
         id: Date.now(),
         sender: 'system',
@@ -53,6 +67,12 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
     };
 
     const handleStreamStart = (data) => {
+      // Clear typing timeout and hide typing indicator when actual streaming starts
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      setIsTyping(false);
       setStreamingMessages(prev => {
         const newMap = new Map(prev);
         newMap.set(data.messageId, {
@@ -99,6 +119,12 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
 
     const handleAiResponse = (data) => {
       // Handle complete AI response (non-streaming)
+      // Clear typing timeout and hide typing indicator when response arrives
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      setIsTyping(false);
       setMessages(prev => [...prev, {
         id: data.messageId,
         sender: 'ai',
@@ -124,12 +150,24 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
     websocketService.on('ai-response', handleAiResponse);
     websocketService.on('error', handleError);
 
-    // Connect to WebSocket server
+    // Connect to WebSocket server only if not already initialized
     websocketService.setServerUrl(serverUrl);
-    websocketService.connect();
+    
+    // Prevent duplicate connections in StrictMode
+    if (!connectionInitialized.current) {
+      connectionInitialized.current = true;
+      websocketService.connect();
+    }
 
     // Cleanup on unmount
     return () => {
+      // Clear typing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      
+      // Don't reset connectionInitialized.current here to prevent StrictMode double connection
       websocketService.off('connected', handleConnected);
       websocketService.off('disconnected', handleDisconnected);
       websocketService.off('system-message', handleSystemMessage);
@@ -138,12 +176,26 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
       websocketService.off('stream-end', handleStreamEnd);
       websocketService.off('ai-response', handleAiResponse);
       websocketService.off('error', handleError);
-      websocketService.disconnect();
+      // Only disconnect if component is truly unmounting, not just StrictMode cleanup
+      if (!connectionInitialized.current) {
+        websocketService.disconnect();
+      }
     };
   }, [serverUrl]);
 
   const sendMessage = useCallback((message) => {
     if (connectionStatus === 'CONNECTED') {
+      setIsTyping(true); // Show typing indicator when sending message
+      
+      // Set a timeout to hide typing indicator if no response comes within 10 seconds
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping(false);
+        typingTimeoutRef.current = null;
+      }, 10000);
+      
       return websocketService.sendMessage(message);
     } else {
       setError('WebSocket not connected. Cannot send message.');
@@ -183,13 +235,36 @@ export const WebSocketProvider = ({ children, serverUrl = 'ws://localhost:3001' 
     return websocketService.reconnectWithToken();
   }, []);
 
+  const submitFeedback = useCallback((messageId, feedbackType, comment = '') => {
+    // Store feedback locally
+    setMessageFeedback(prev => {
+      const newMap = new Map(prev);
+      newMap.set(messageId, {
+        type: feedbackType, // 'positive' or 'negative'
+        comment: comment,
+        timestamp: new Date().toISOString()
+      });
+      return newMap;
+    });
+
+    // Send feedback to server if connected
+    if (connectionStatus === 'CONNECTED') {
+      websocketService.sendFeedback(messageId, feedbackType, comment);
+    }
+
+    return true;
+  }, [connectionStatus]);
+
   const value = {
     connectionStatus,
     messages,
     streamingMessages: Array.from(streamingMessages.values()),
     error,
+    isTyping,
+    messageFeedback,
     sendMessage,
     sendHumanEscalation,
+    submitFeedback,
     connect,
     disconnect,
     clearMessages,

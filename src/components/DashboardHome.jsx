@@ -2,10 +2,10 @@ import React from 'react';
 import styles from '../styles/DashboardHome.module.css';
 
 const stats = [
-  { label: 'Active Users', value: 128, icon: '👥', color: '#1976d2' },
-  { label: 'Chats Today', value: 54, icon: '💬', color: '#43a047' },
-  { label: 'Uploads', value: 12, icon: '📁', color: '#fbc02d' },
-  { label: 'Errors', value: 1, icon: '⚠️', color: '#e53935' },
+  { label: 'Chats Today', value: 54, icon: '�', color: '#43a047' },
+  { label: 'Success Responses', value: 48, icon: '✅', color: '#1976d2' },
+  { label: 'Inefficient Response', value: 5, icon: '❌', color: '#fbc02d' },
+  { label: 'Files Uploaded', value: 1, icon: '📄', color: '#e53935' },
 ];
 
 const DashboardHome = () => (

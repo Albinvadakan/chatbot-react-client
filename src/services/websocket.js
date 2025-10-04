@@ -9,6 +9,7 @@ class WebSocketService {
     this.pingInterval = null;
     this.pingIntervalTime = 30000; // 30 seconds
     this.streamingMessages = new Map(); // Track streaming messages
+    this.connectionMessageShown = false; // Track if connection message was already emitted
   }
 
   getAuthenticatedUrl(baseUrl = this.baseUrl) {
@@ -20,6 +21,12 @@ class WebSocketService {
   }
 
   connect(baseUrl = this.baseUrl) {
+    // Prevent duplicate connections
+    if (this.socket && (this.socket.readyState === WebSocket.CONNECTING || this.socket.readyState === WebSocket.OPEN)) {
+      console.log('WebSocket already connected or connecting, skipping duplicate connection');
+      return true;
+    }
+
     try {
       const authenticatedUrl = this.getAuthenticatedUrl(baseUrl);
       console.log('Connecting to WebSocket:', authenticatedUrl);
@@ -74,10 +81,14 @@ class WebSocketService {
   handleIncomingMessage(message) {
     switch(message.type) {
       case 'connection':
-        this.emit('system-message', {
-          text: message.message,
-          timestamp: message.timestamp
-        });
+        // Prevent duplicate connection messages at service level
+        if (!this.connectionMessageShown) {
+          this.connectionMessageShown = true;
+          this.emit('system-message', {
+            text: message.message,
+            timestamp: message.timestamp
+          });
+        }
         break;
         
       case 'stream-start':
@@ -199,6 +210,26 @@ class WebSocketService {
     }
   }
 
+  sendFeedback(messageId, feedbackType, comment = '') {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      const feedbackMessage = {
+        type: 'feedback',
+        messageId: messageId,
+        feedbackType: feedbackType, // 'positive' or 'negative'
+        comment: comment,
+        timestamp: new Date().toISOString()
+      };
+      
+      this.socket.send(JSON.stringify(feedbackMessage));
+      console.log('Feedback sent:', feedbackMessage);
+      return true;
+    } else {
+      console.warn('WebSocket not connected. Cannot send feedback.');
+      this.emit('error', new Error('WebSocket not connected'));
+      return false;
+    }
+  }
+
   sendPing() {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       const pingMessage = {
@@ -235,6 +266,7 @@ class WebSocketService {
       this.socket.close(1000, 'Manual disconnect');
       this.socket = null;
     }
+    this.connectionMessageShown = false; // Reset flag on disconnect
   }
 
   getConnectionState() {

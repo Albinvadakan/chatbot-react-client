@@ -233,6 +233,50 @@
   color: #d32f2f;
 }
 
+/* Success Banner */
+.successBanner {
+  background: #e8f5e8;
+  border: 1px solid #c8e6c9;
+  color: #2e7d2e;
+  padding: 0.7rem 1rem;
+  margin: 0.5rem 1rem;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  animation: slideInFadeOut 3s ease-in-out;
+}
+
+.successClose {
+  background: none;
+  border: none;
+  color: #2e7d2e;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes slideInFadeOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  10%, 90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 /* Disabled Input Styling */
 .inputForm input:disabled {
   background: #f5f5f5;
@@ -296,4 +340,97 @@
   align-items: center;
   justify-content: space-between;
   padding-right: 1.5rem;
+}
+
+/* Formatted Message Styles */
+.formattedMessage {
+  line-height: 1.6;
+}
+
+.formattedMessage p {
+  margin: 0 0 12px 0;
+  text-align: left;
+}
+
+.formattedMessage p:last-child {
+  margin-bottom: 0;
+}
+
+.formattedMessage ul {
+  margin: 8px 0 12px 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.formattedMessage li {
+  margin: 6px 0;
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.formattedMessage li::before {
+  content: "•";
+  color: #1976d2;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.formattedMessage strong {
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.formattedMessage li strong {
+  color: #1976d2;
+}
+
+/* Better spacing for numbered lists */
+.formattedMessage li:has(strong) {
+  padding-left: 0;
+}
+
+.formattedMessage li:has(strong)::before {
+  display: none;
+}
+
+/* Message container adjustments for feedback buttons */
+.messageRow > div:last-child {
+  max-width: 420px;
+  width: 100%;
+}
+
+/* Ordered/Numbered Lists */
+.formattedMessage ol.numbered-list {
+  margin: 12px 0;
+  padding-left: 0;
+  counter-reset: item;
+}
+
+.formattedMessage ol.numbered-list li {
+  margin: 8px 0;
+  padding-left: 0;
+  display: block;
+  position: relative;
+}
+
+.formattedMessage ol.numbered-list li::before {
+  display: none;
+}
+
+.formattedMessage ol.numbered-list li strong:first-child {
+  color: #1976d2;
+  margin-right: 8px;
+}
+
+/* Better paragraph spacing */
+.formattedMessage p {
+  margin: 0 0 16px 0;
+  text-align: left;
+  line-height: 1.7;
+}
+
+.formattedMessage p:last-child {
+  margin-bottom: 0;
 }

@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styles from '../styles/Chat.module.css';
 import { useWebSocket } from '../contexts/WebSocketContext';
+import TypingIndicator from './TypingIndicator';
+import FeedbackButtons from './FeedbackButtons';
+import HumanHelpModal from './HumanHelpModal';
+import { renderFormattedMessage } from '../utils/messageFormatter';
 
 const Chat = () => {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: 'ai',
-      text: "Hello! I'm your AI assistant. How can I help you today?",
-      time: '18:23',
-    },
-  ]);
+  const [feedbackNotification, setFeedbackNotification] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [isHumanHelpModalOpen, setIsHumanHelpModalOpen] = useState(false);
 
   const { 
     sendMessage, 
@@ -21,6 +20,9 @@ const Chat = () => {
     connectionStatus, 
     error, 
     isConnected,
+    isTyping,
+    messageFeedback,
+    submitFeedback,
     clearError 
   } = useWebSocket();
 
@@ -90,9 +92,41 @@ const Chat = () => {
   };
 
   const handleHumanEscalation = () => {
-    const reason = prompt('Please describe why you need human assistance:');
-    if (reason) {
-      sendHumanEscalation(reason);
+    setIsHumanHelpModalOpen(true);
+  };
+
+  const handleCloseHumanHelpModal = () => {
+    setIsHumanHelpModalOpen(false);
+  };
+
+  const handleHumanHelpSubmit = async (formData) => {
+    // Format the request with the collected information
+    const formattedReason = `
+Human Assistance Request:
+
+Reason: ${formData.reason}
+Contact Number: ${formData.contactNumber}
+Priority: ${formData.priority}
+    `.trim();
+
+    // Use existing sendHumanEscalation function
+    sendHumanEscalation(formattedReason);
+  };
+
+  const handleFeedback = (messageId, feedbackType, comment) => {
+    const success = submitFeedback(messageId, feedbackType, comment);
+    if (success) {
+      // Show success notification
+      setFeedbackNotification(
+        feedbackType === 'positive' 
+          ? 'Thank you for your positive feedback!' 
+          : 'Thank you for your feedback! This helps us improve.'
+      );
+      
+      // Clear notification after 3 seconds
+      setTimeout(() => {
+        setFeedbackNotification('');
+      }, 3000);
     }
   };
 
@@ -126,6 +160,13 @@ const Chat = () => {
         </div>
       )}
       
+      {feedbackNotification && (
+        <div className={styles.successBanner}>
+          <span>✅ {feedbackNotification}</span>
+          <button onClick={() => setFeedbackNotification('')} className={styles.successClose}>×</button>
+        </div>
+      )}
+      
       <div className={styles.subTitle}>
         Start a conversation with the AI assistant
         {isConnected && (
@@ -149,10 +190,27 @@ const Chat = () => {
               </div>
               <div>
                 <div className={`${styles.message} ${msg.isStreaming ? styles.streamingMessage : ''}`}>
-                  {msg.text}
-                  {msg.isStreaming && <span className={styles.cursor}>|</span>}
+                  {msg.isStreaming ? (
+                    <>
+                      {msg.text}
+                      <span className={styles.cursor}>|</span>
+                    </>
+                  ) : (
+                    <div 
+                      className={styles.formattedMessage}
+                      dangerouslySetInnerHTML={{ __html: renderFormattedMessage(msg.text) }}
+                    />
+                  )}
                 </div>
                 <div className={styles.time}>{msg.time}</div>
+                {/* Show feedback buttons only for AI messages (not system messages) and not for streaming messages */}
+                {msg.sender === 'ai' && !msg.isStreaming && (
+                  <FeedbackButtons
+                    messageId={msg.id}
+                    onFeedback={handleFeedback}
+                    currentFeedback={messageFeedback.get(msg.id)}
+                  />
+                )}
               </div>
             </div>
           ) : (
@@ -165,6 +223,7 @@ const Chat = () => {
             </div>
           )
         ))}
+        {isTyping && <TypingIndicator />}
       </div>
       <form className={styles.inputForm} onSubmit={handleSubmit}>
         <input
@@ -182,6 +241,12 @@ const Chat = () => {
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24"><path fill="#fff" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
       </form>
+
+      <HumanHelpModal
+        isOpen={isHumanHelpModalOpen}
+        onClose={handleCloseHumanHelpModal}
+        onSubmit={handleHumanHelpSubmit}
+      />
     </div>
   );
 };

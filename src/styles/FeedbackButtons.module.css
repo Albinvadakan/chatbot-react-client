@@ -1,0 +1,168 @@
+.feedbackContainer {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f1f3;
+}
+
+.feedbackButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.feedbackBtn {
+  background: none;
+  border: 1px solid #e0e7ef;
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+}
+
+.feedbackBtn:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  border-color: #d0d7de;
+  transform: translateY(-1px);
+}
+
+.feedbackBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.feedbackBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.thumbsUp.active {
+  background-color: #e8f5e8;
+  border-color: #4caf50;
+  color: #2e7d2e;
+}
+
+.thumbsDown.active {
+  background-color: #ffeaea;
+  border-color: #f44336;
+  color: #c62828;
+}
+
+.commentSection {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e7ef;
+  border-radius: 8px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.commentInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 60px;
+  background-color: #fff;
+}
+
+.commentInput:focus {
+  outline: none;
+  border-color: #2979ff;
+  box-shadow: 0 0 0 2px rgba(41, 121, 255, 0.1);
+}
+
+.commentButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+
+.submitBtn {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background-color: #1565c0;
+}
+
+.submitBtn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background-color: #f5f7fa;
+  color: #666;
+  border: 1px solid #d0d7de;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn:hover {
+  background-color: #e8eaed;
+  border-color: #bcc4cc;
+}
+
+.feedbackStatus {
+  margin-top: 8px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.feedbackText {
+  font-size: 12px;
+  color: #4caf50;
+  font-weight: 500;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 200px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .commentButtons {
+    flex-direction: column;
+  }
+  
+  .submitBtn,
+  .cancelBtn {
+    width: 100%;
+  }
+}

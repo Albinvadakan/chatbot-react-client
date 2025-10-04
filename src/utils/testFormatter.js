@@ -1,0 +1,7 @@
+import { renderFormattedMessage } from './messageFormatter';
+
+// Test the message formatter with a sample diabetes response
+const testMessage = `Diabetes is a chronic metabolic disorder characterized by high levels of sugar in the blood, a condition known as hyperglycemia. In normal conditions, food is broken down into glucose, which is then released into the bloodstream to serve as fuel for the body. The pancreas produces insulin, a hormone that helps transport glucose from the bloodstream into muscles, fat, and the liver, where it can be utilized as fuel. However, individuals with diabetes face challenges in regulating their blood sugar levels due to either insufficient insulin production by the pancreas or the body's cells not responding effectively to insulin (insulin resistance). This results in elevated blood sugar levels, which can lead to various complications if not managed properly. There are different types of diabetes, including: 1. Type 1 diabetes (T1D): Typically develops early in life and involves the immune system attacking insulin-producing cells in the pancreas. 2. Type 2 diabetes (T2D): Usually develops in adulthood and is characterized by insulin resistance and relative insulin deficiency.`;
+
+console.log('Formatted message:');
+console.log(renderFormattedMessage(testMessage));
